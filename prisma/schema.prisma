@@ -1,0 +1,49 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id      String   @id @default(uuid())
+  nama    String
+  email   String   @unique
+  noHp    String   @unique
+  laporan LaporanSampah[]   // opposite field - REQUIRED
+}
+
+model JenisSampah {
+  id        String @id @default(uuid())
+  namaJenis String @unique
+  laporan   LaporanSampah[]   // opposite field - REQUIRED
+}
+
+model Wilayah {
+  id          String @id @default(uuid())
+  namaWilayah String @unique
+  laporan     LaporanSampah[]   // opposite field - REQUIRED
+}
+
+model LaporanSampah {
+  id            String      @id @default(uuid())
+  berat         Float
+  tanggalLapor  DateTime    @default(now())
+  userId        String
+  jenisSampahId String
+  wilayahId     String
+
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  jenisSampah   JenisSampah @relation(fields: [jenisSampahId], references: [id], onDelete: Restrict)
+  wilayah       Wilayah     @relation(fields: [wilayahId], references: [id], onDelete: Restrict)
+  foto          FotoSampah?
+}
+
+model FotoSampah {
+  id        String @id @default(uuid())
+  imageUrl  String
+  laporanId String @unique
+
+  laporan LaporanSampah @relation(fields: [laporanId], references: [id], onDelete: Cascade)
+}
